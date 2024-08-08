@@ -1,0 +1,8 @@
+[tool.poetry]
+name = "My_assistant_Mia"
+version = "0.1.0"
+description = ""
+authors = ["Mila <liudmilabernikovich@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.12"

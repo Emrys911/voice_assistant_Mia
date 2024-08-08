@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  apache:
+    build:
+      context: .
+      dockerfile: Dockerfile.apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app:/usr/local/apache2/htdocs/
+    networks:
+      - webnet
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "8081:80"
+    volumes:
+      - ./app:/usr/share/nginx/html
+    networks:
+      - webnet
+
+  bot:
+    build: templates
+    container_name: telegram_bot
+    environment:
+      TELEGRAM_TOKEN: "7270899136:AAGCO8kmsW2H0HQUFnitKiC6SOLNGT3DUUE"
+      OPENAI_API_KEY: "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"
+      BOTNAME: "telebot_Mia"
+      WEATHER_API_KEY: "f7a51032f4c134dec171910751b38ff4"
+      BASE_URL: "https://api.openweathermap.org/data/2.5/weather"
+      NEWS_API_KEY: "b3165457-cc74-4cbb-b056-ff6aa2932955"
+      NEWS_URL: "https://www.jsonapi.co/public-api/World%20News%20API"
+      MUSIC_API_KEY: "nO9Y4AsZqO7EChld21340LkeJSJjg02O"
+      MUSIC_URL: "https://open.spotify.com/playlist/1YL4XoegERoragv0RK2RC9?si=J_gjiiNUSwadNb25zIZbIw&dl_branch=1&nd=1&dlsi=19e8d23c01274ee0"
+      FILMS_API_KEY: "nO9Y4AsZqO7EChld21340LkeJSJjg02O"
+      FILMS_URL: "https://streaming-availability.p.rapidapi.com/shows/%7Btype%7D/%7Bid%7D"
+      FILMS_URL2: "https://kinogo.vin/"
+      REQUESTS_API_KEY: "8b9a6909e5msh52f33564e72f167p185b6fjsnd4942c9e4d9e"
+      REQUESTS_URL: "https://google-news13.p.rapidapi.com/business?lr=en-US"
+      DICTIONARY_API_KEY: "26d88ad4-991f-4cab-b329-828e77ec236d"
+      DICTIONARY_URL: "https://Free-Dictionary.allthingsdev.co/endpoint"
+    volumes:
+      - .:/app
+    ports:
+      - "5000:5000"
+    networks:
+      - webnet
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - webnet
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - webnet
+
+networks:
+  webnet:
+
+volumes:
+  postgres_data:
